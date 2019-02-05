@@ -44,6 +44,7 @@ exports.findWeaknessDialogFlowFulfillment = functions.https.onRequest((request, 
     } else {
       return agent.add(`Are you sure about those types?`);
     }
+    
     const quadDamage = [], doubleDamage = [];
     for (let weakness in weaknessesObj) {
         if (weaknessesObj[weakness] === 4) {
@@ -53,7 +54,26 @@ exports.findWeaknessDialogFlowFulfillment = functions.https.onRequest((request, 
           doubleDamage.push(weakness)
         }
     }
-    agent.add(`Here's the obj: ${weaknessesObj}`);
+
+    agent.add(`${typeArray[0]} ${
+      typeArray[1] 
+        ? ` and ${typeArray[1]}`
+        : ''
+    } Pokemon takes ${
+      quadDamage.length 
+        ? `quadtruple damage from ${quadDamage.join(', ')}${
+            doubleDamage.length ? ' and ' : ''
+          }`
+        : ''
+      }${
+      doubleDamage.length 
+        ? `double damage from ${doubleDamage.join(', ')}`
+        : '' 
+      }${
+        !quadDamage.length && !doubleDamage.length
+          ? `no reduced damage`
+          : ''
+    }.`);;
   }
 
   let intentMap = new Map();
