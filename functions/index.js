@@ -7,7 +7,7 @@ exports.findWeaknessDialogFlowFulfillment = functions.https.onRequest((request, 
   const pokemonWeaknesses = ()  => {
     const typeArray = request.body.queryResult.parameters.Types;
     const { quadDamage, doubleDamage } = getWeaknesses(typeArray);
-    if (!quadDamage.length && !doubleDamage.length) {
+    if (!quadDamage && !doubleDamage) {
       return agent.add(`Are you sure about those types?`); 
     }
 
@@ -39,6 +39,9 @@ exports.findWeaknessDialogFlowFulfillment = functions.https.onRequest((request, 
 
 // spread operator doesn't work in cloud functions
 export const getWeaknesses = typeArray => {
+  if (typeArray.length !== 1 && typeArray.length !== 2) {
+    return {};
+  }
   let weaknessesObj = {};
   if (typeArray.length === 1) {
     weaknessesObj =  Object.assign({}, weaknesses[typeArray[0]]);
@@ -66,7 +69,7 @@ export const getWeaknesses = typeArray => {
   return {quadDamage, doubleDamage};
 }
 
-const weaknesses = {
+export const weaknesses = {
   Normal: {
     Fighting: 2,
     Ghost: 0,
