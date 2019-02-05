@@ -1,65 +1,21 @@
 const functions = require('firebase-functions');
 const { WebhookClient } = require('dialogflow-fulfillment');
 
-// exports.findWeaknesses = functions.https.onCall(data => {
-//   const types = data.pokemonTypes;
-//   if (!types.type2) {
-//     return weaknesses[types.type1];
-//   } else {
-//     // spread operator doesn't work currently with firebase cloud functions
-//     const hybrid = Object.assign({}, weaknesses[types.type1]);
-//     const secondTypeWeaknesses = weaknesses[types.type2];
-//     for (let weakType in secondTypeWeaknesses) {
-//       if (hybrid[weakType]) {
-//         hybrid[weakType] = hybrid[weakType] * secondTypeWeaknesses[weakType];
-//       } else {
-//         hybrid[weakType] = secondTypeWeaknesses[weakType];
-//       }
-//     }
-//     return hybrid;
-//   }
-// });
-
 exports.findWeaknessDialogFlowFulfillment = functions.https.onRequest((request, response) => {
-  console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
   const agent = new WebhookClient({ request, response });
   
-  const getWeaknesses = ()  => {
-    const typeArray = request.body.queryResult.parameters.Types
-    let weaknessesObj;
-
-    if (typeArray.length === 1) {
-      weaknessesObj = Object.assign({}, weaknesses[typeArray[0]]);
-    } else if ( typeArray.length === 2 ) {
-      const hybrid = Object.assign({}, weaknesses[typeArray[0]]);
-      const secondTypeWeaknesses = weaknesses[typeArray[1]];
-      for (let weakType in secondTypeWeaknesses) {
-        if (hybrid[weakType]) {
-          hybrid[weakType] = hybrid[weakType] * secondTypeWeaknesses[weakType];
-        } else {
-          hybrid[weakType] = secondTypeWeaknesses[weakType];
-        }
-      }
-      weaknessesObj = hybrid;
-    } else {
-      return agent.add(`Are you sure about those types?`);
-    }
-    
-    const quadDamage = [], doubleDamage = [];
-    for (let weakness in weaknessesObj) {
-        if (weaknessesObj[weakness] === 4) {
-          quadDamage.push(weakness);
-        }
-        if (weaknessesObj[weakness] === 2) {
-          doubleDamage.push(weakness)
-        }
+  const pokemonWeaknesses = ()  => {
+    const typeArray = request.body.queryResult.parameters.Types;
+    const { quadDamage, doubleDamage } = getWeaknesses(typeArray);
+    if (!quadDamage.length && !doubleDamage.length) {
+      return agent.add(`Are you sure about those types?`); 
     }
 
     agent.add(`${typeArray[0]} ${
       typeArray[1] 
         ? ` and ${typeArray[1]}`
         : ''
-    } Pokemon takes ${
+    } Pokemons take ${
       quadDamage.length 
         ? `quadtruple damage from ${quadDamage.join(', ')}${
             doubleDamage.length ? ' and ' : ''
@@ -77,9 +33,38 @@ exports.findWeaknessDialogFlowFulfillment = functions.https.onRequest((request, 
   }
 
   let intentMap = new Map();
-  intentMap.set('pokemon.weaknesses', getWeaknesses);
+  intentMap.set('pokemon.weaknesses', pokemonWeaknesses);
   agent.handleRequest(intentMap);
 })
+
+// spread operator doesn't work in cloud functions
+export const getWeaknesses = typeArray => {
+  let weaknessesObj = {};
+  if (typeArray.length === 1) {
+    weaknessesObj =  Object.assign({}, weaknesses[typeArray[0]]);
+  } else if ( typeArray.length === 2 ) {
+    const hybrid = Object.assign({}, weaknesses[typeArray[0]]);
+    const secondTypeWeaknesses = weaknesses[typeArray[1]];
+    for (let weakType in secondTypeWeaknesses) {
+      if (hybrid[weakType]) {
+        hybrid[weakType] = hybrid[weakType] * secondTypeWeaknesses[weakType];
+      } else {
+        hybrid[weakType] = secondTypeWeaknesses[weakType];
+      }
+    }
+    weaknessesObj = hybrid;
+  }
+  const quadDamage = [], doubleDamage = [];
+  for (let weakness in weaknessesObj) {
+    if (weaknessesObj[weakness] === 4) {
+      quadDamage.push(weakness);
+    }
+    if (weaknessesObj[weakness] === 2) {
+      doubleDamage.push(weakness);
+    }
+  }
+  return {quadDamage, doubleDamage};
+}
 
 const weaknesses = {
   Normal: {
