@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
-import './App.css';
+import { Paper, Typography } from '@material-ui/core';
+import './App.scss';
+
+import IndividualMessage from './components/IndividualMessage/IndividualMessage'
 
 const INITIAL_STATE = {
-  mess: ''
+  messages: []
 }
 
 class App extends Component {
@@ -12,17 +15,46 @@ class App extends Component {
   };
 
   componentDidMount () {
-    this.setState({ mess:'world' })
+    this.setState({ messages: dummyMessages })
   };
 
   render() {
-
     return (
-      <div className="App">
-        Hello {this.state.mess}
+      <div className='App'>
+        <Paper className='App-Paper' elevation={1}>
+          <div className='App-Paper-MessageContainer'>
+            {this.state.messages.map(message => <IndividualMessage 
+              senderIsHuman={message.senderIsHuman}
+              messageText={message.messageText}
+              key={message.sentUtcTime}
+            />)}
+          </div>
+        </Paper>
       </div>
     );
   }
 }
 
+const dummyMessages = [
+  {
+    senderIsHuman: true,
+    messageText: 'Hello!',
+    sentUtcTime: 1549399484183
+  },
+  {
+    senderIsHuman: false,
+    messageText: 'Greetings!',
+    sentUtcTime: 1549399609047
+  },
+  {
+    senderIsHuman: true,
+    messageText: 'I just wanted to send a really exorbantly long message so  I can see what it looks like if I were to go past the limits of the horizontal scroll. We are working pretty high resolution monitors these days so this message has to be really long. For gaming purposes though, I suggest the middle ground between a high refresh monitor 144hz monitor and 2k display, unless you have a boat of money to spend on both the rig and the monitors. How is your day going?',
+    sentUtcTime: 1549399649775
+  },
+  {
+    senderIsHuman: false,
+    messageText: 'Feeling Wonderful!',
+    sentUtcTime: 1549399747481
+  }
+]
 export default App;
