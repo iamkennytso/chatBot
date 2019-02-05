@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Paper, Typography } from '@material-ui/core';
+import { Paper } from '@material-ui/core';
 import './App.scss';
 
 import IndividualMessage from './components/IndividualMessage/IndividualMessage'
+import InputBar from './components/InputBar/InputBar'
 
 const INITIAL_STATE = {
   messages: []
@@ -29,6 +30,7 @@ class App extends Component {
               key={message.sentUtcTime}
             />)}
           </div>
+          <InputBar />
         </Paper>
       </div>
     );

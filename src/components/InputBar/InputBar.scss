@@ -1,0 +1,8 @@
+.InputBar {
+  background-color: silver;
+  display: flex;
+  flex-direction: row;
+  & &-Input{
+    padding: 0px 5px;
+  }
+}

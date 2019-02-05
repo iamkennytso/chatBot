@@ -8,5 +8,7 @@
   &-Paper {
     height: 95%;
     width: 95%;
+    display: grid;
+    grid-template-rows: 1fr auto;
   }
 }
