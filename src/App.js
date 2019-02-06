@@ -6,7 +6,8 @@ import IndividualMessage from './components/IndividualMessage/IndividualMessage'
 import InputBar from './components/InputBar/InputBar'
 
 const INITIAL_STATE = {
-  messages: []
+  messages: [],
+  userInputMessage: '',
 }
 
 class App extends Component {
@@ -19,18 +20,49 @@ class App extends Component {
     this.setState({ messages: dummyMessages })
   };
 
+  handleUserInput = inputField => e => {
+    this.setState({ [inputField]: e.target.value })
+  }
+
+  handleUserSubmitMessage = e => {
+    e.preventDefault();
+    if (!this.state.userInputMessage) {
+      return;
+    }
+    console.log(this.refs)
+    const sentUtcTime = new Date().getTime();
+    const messages = this.state.messages;
+    messages.push({
+      senderIsHuman: true,
+      messageText: this.state.userInputMessage,
+      sentUtcTime
+    })
+    this.setState({ messages, userInputMessage: INITIAL_STATE.userInputMessage }, 
+      // function to scroll to bottom of input box
+      () => {
+        const { messagesContainer } = this.refs;
+        messagesContainer.scrollTop = messagesContainer.scrollHeight - messagesContainer.clientHeight;
+      }
+    )
+  }
+
   render() {
+    console.log(this.state)
     return (
       <div className='App'>
         <Paper className='App-Paper' elevation={1}>
-          <div className='App-Paper-MessageContainer'>
+          <div className='App-Paper-MessageContainer' ref='messagesContainer'>
             {this.state.messages.map(message => <IndividualMessage 
               senderIsHuman={message.senderIsHuman}
               messageText={message.messageText}
               key={message.sentUtcTime}
             />)}
           </div>
-          <InputBar />
+          <InputBar 
+            handleUserInput={this.handleUserInput}
+            handleUserSubmitMessage={this.handleUserSubmitMessage}
+            userInputMessage={this.state.userInputMessage}
+          />
         </Paper>
       </div>
     );
