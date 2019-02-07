@@ -19,9 +19,9 @@ class App extends Component {
     this.state = INITIAL_STATE;
   };
 
-  componentDidMount () {
+  // componentDidMount () {
 
-  };
+  // };
 
   handleUserLogin = user => {
     const sentUtcTime = new Date().getTime();

@@ -5,13 +5,12 @@ const uuid = require('uuid')
 require('dotenv').config()
 
 let app = express();
-app.use(express.static(__dirname + '/../build'))
+// app.use(express.static(__dirname + '/../build'))
 app.use(bodyParser.json())
-const port = 1337;
+const port = 5001;
 app.listen(port, ()=> console.log(`(>'.')> listening on ${port}`))
 
 app.post ('/sendMessage', async (request, response) => {
-  console.log('hit')
   const sessionId = uuid.v4()
   const sessionClient = new dialogflow.SessionsClient();
   const sessionPath = sessionClient.sessionPath('testdiaflow-cffb8', sessionId)
