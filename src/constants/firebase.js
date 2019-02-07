@@ -1,4 +1,5 @@
 import firebase from 'firebase/app';
+import 'firebase/auth';
 import 'firebase/functions';
 
 const config = {
@@ -14,4 +15,3 @@ const fire = firebase.initializeApp(config);
 
 
 export default fire;
-export const cloudFunctions = fire.functions();
