@@ -1,9 +1,11 @@
 const functions = require('firebase-functions');
 const { WebhookClient } = require('dialogflow-fulfillment');
+// const dialogflow = require('dialogflow')
+// const uuid = require('uuid')
 
-exports.findWeaknessDialogFlowFulfillment = functions.https.onRequest((request, response) => {
+const findWeaknessDialogFlowFulfillment = functions.https.onRequest((request, response) => {
   const agent = new WebhookClient({ request, response });
-  
+
   const pokemonWeaknesses = ()  => {
     const typeArray = request.body.queryResult.parameters.Types;
     const { quadDamage, doubleDamage } = getWeaknesses(typeArray);
@@ -37,8 +39,40 @@ exports.findWeaknessDialogFlowFulfillment = functions.https.onRequest((request, 
   agent.handleRequest(intentMap);
 })
 
+// TODO: to get this function in the cloud, figure out how to authenticate live
+// const receiveMessage = functions.https.onRequest((request, response) => {
+//   const sessionId = uuid.v4()
+//   const sessionClient = new dialogflow.SessionsClient();
+//   const sessionPath = sessionClient.sessionPath('testdiaflow-cffb8', sessionId)
+//   const dialogFlowRequest = {
+//     session: sessionPath,
+//     queryInput: {
+//       text: {
+//         text: request.body.newMessage,
+//         languageCode: 'en-US',
+//       }
+//     }
+//   };
+
+//   try {
+//     const dialogFlowResponse = await sessionClient.detectIntent(dialogFlowRequest)
+//     response.send({
+//       senderIsHuman: false,
+//       messageText: dialogFlowResponse[0].queryResult.fulfillmentText,
+//       sentUtcTime: new Date().getTime(),
+//     })
+//   } catch (err) {
+//     console.error(err)
+//     response.send({
+//       senderIsHuman: false,
+//       messageText: 'An Error occured, please check your connection!',
+//       sentUtcTime: new Date().getTime(),
+//     })
+//   }
+// })
+
 // spread operator doesn't work in cloud functions
-export const getWeaknesses = typeArray => {
+const getWeaknesses = typeArray => {
   if (typeArray.length !== 1 && typeArray.length !== 2) {
     return {};
   }
@@ -69,7 +103,7 @@ export const getWeaknesses = typeArray => {
   return {quadDamage, doubleDamage};
 }
 
-export const weaknesses = {
+const weaknesses = {
   Normal: {
     Fighting: 2,
     Ghost: 0,
@@ -227,3 +261,9 @@ export const weaknesses = {
     Dark: .5,
   },
 }
+
+module.exports = { 
+  getWeaknesses, 
+  findWeaknessDialogFlowFulfillment, 
+  // receiveMessage
+};

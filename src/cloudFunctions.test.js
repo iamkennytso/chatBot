@@ -1,5 +1,4 @@
-import { getWeaknesses } from '../functions/index'
-
+const { getWeaknesses } = require('../functions/index')
 
 it('gets weaknesses correctly', () => {
   const fireWeakness = getWeaknesses(['Fire']);
