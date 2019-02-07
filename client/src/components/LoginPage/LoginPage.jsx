@@ -23,7 +23,12 @@ class loginDiv extends Component {
    * Handlers 
    */
 
-  _handleLogin = async e => {
+  /**
+  * Sends a request to firebase to attmept to authenticate the user.
+  * Will either call props.handleLogin, or this._handleInvalid
+  * @param {event} e - synthetic event, need to stop its propagation 
+  */
+  _handleSubmit = async e => {
     e.preventDefault();
     try {
       const user = await firebase.auth().signInWithEmailAndPassword(this.state.username, this.state.password);
@@ -41,11 +46,20 @@ class loginDiv extends Component {
     }
   };
 
+  /**
+  * Handles keyboard changes on the text field
+  * @param {event} e - synthetic event containing the value of the target
+  * @param {string} inputField - string representing the field being editted
+  */
   _handleChange = field => event =>
     this.setState({
       [field]: event.target.value,
     });
 
+  /**
+  * Handles when a login attempt is invalid
+  * Changes the text to NO! if it isn't already NO!, or adds an exclamation point
+  */
   _handleInvalid = () => {
     this.setState({
       mess: this.state.mess[0] === 'N'
@@ -53,17 +67,17 @@ class loginDiv extends Component {
         : 'NO'
     });
   };
+
   /**
    * Renderer
    */
-
   render() {
     return (
       <div className="Login" >
         <div className='Login-Name'> Demo Chatbox </div>
         <img className='Login-Logo' src={Logo} alt="Cedrus" /> <br />
         <div className='Login-Message'> {this.state.mess} </div>
-        <form className='Login-Form' onSubmit={this._handleLogin}>
+        <form className='Login-Form' onSubmit={this._handleSubmit}>
           <TextField className='Login-Field' onChange={this._handleChange('username')} fullWidth autoFocus />
           <TextField className='Login-Field' onChange={this._handleChange('password')} fullWidth type="password" />
           <Button className='Login-Button' variant="contained" fullWidth color="primary" type="submit"> Login </Button>

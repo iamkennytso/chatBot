@@ -25,19 +25,18 @@ app.post ('/sendMessage', async (request, response) => {
   };
 
   try {
-    const dialogFlowResponse = await sessionClient.detectIntent(dialogFlowRequest)
-    console.log(dialogFlowResponse)
+    const dialogFlowResponse = await sessionClient.detectIntent(dialogFlowRequest);
     response.send({
       senderIsHuman: false,
       messageText: dialogFlowResponse[0].queryResult.fulfillmentText,
       sentUtcTime: new Date().getTime(),
-    })
+    });
   } catch (err) {
-    console.error(err)
+    console.error(err);
     response.send({
       senderIsHuman: false,
       messageText: 'An Error occured, please check your connection!',
       sentUtcTime: new Date().getTime(),
-    })
+    });
   }
 })

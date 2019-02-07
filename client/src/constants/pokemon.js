@@ -1,3 +1,5 @@
+// list of the original 151 pokemons, with their Alolan variations, and their types.
+
 export default {
   Bulbasaur: { type1: 'Grass', type2: 'Poison' },
   Ivysaur: { type1: 'Grass', type2: 'Poison' },
