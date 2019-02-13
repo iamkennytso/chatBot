@@ -20,3 +20,6 @@ it('gets weaknesses correctly', () => {
     expect(threeTypeWeakness.quadDamage).toEqual(undefined);
 })
 
+// it("gets most pokemon's weaknesses", () => {
+//   const pikachuWeakness = findWeaknessDialogFlowFulfillment
+// })

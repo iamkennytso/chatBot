@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
 import { Paper } from '@material-ui/core';
 import axios from 'axios';
+import uuid from 'uuid'
 import './App.scss';
 
 import LoginPage from './components/LoginPage/LoginPage';
 import IndividualMessage from './components/IndividualMessage/IndividualMessage';
 import InputBar from './components/InputBar/InputBar';
+import MessageCard from './components/MessageCard/MessageCard'
 
 const INITIAL_STATE = {
   user: null,
   messages: [],
   userInputMessage: '',
+  sessionId: '',
 };
 
 class App extends Component {
@@ -19,9 +22,10 @@ class App extends Component {
     this.state = INITIAL_STATE;
   };
 
-  // componentDidMount () {
-
-  // };
+  componentWillMount () {
+    const sessionId = uuid.v4()
+    this.setState({ sessionId })
+  };
 
   /**
   * Logs the user in.
@@ -31,7 +35,7 @@ class App extends Component {
     const sentUtcTime = new Date().getTime();
     const messages = [{
       senderIsHuman: false,
-      messageText: `Hello ${user.user.displayName || user.user.email}! How may I be of assistance?`,
+      messageContent: `Hello ${user.user.displayName || user.user.email}! How may I be of assistance?`,
       sentUtcTime,
     }];
     this.setState({ user, messages });
@@ -59,28 +63,40 @@ class App extends Component {
       return;
     }
     const sentUtcTime = new Date().getTime();
+    
     const newMessage = {
       senderIsHuman: true,
-      messageText: this.state.userInputMessage,
+      messageContent: this.state.userInputMessage,
       sentUtcTime,
     };
     const loadingMessage = {
       senderIsHuman: false,
-      messageText: 'Loading...',
+      messageContent: 'Loading...',
       sentUtcTime: sentUtcTime + 1,
     };
     const loadingMessageIndex = this.state.messages.length + 1;
     this.setState({ messages: [...this.state.messages, newMessage, loadingMessage], userInputMessage: INITIAL_STATE.userInputMessage },
       async () => {
-        // function to scroll to bottom of input box
-        const { messagesContainer } = this.refs;
-        messagesContainer.scrollTop = messagesContainer.scrollHeight - messagesContainer.clientHeight;
+        const { sessionId } = this.state;
+
         // local development code start
-        const dialogFlowResponse = await axios.post('/sendMessage', { newMessage });
+        const dialogFlowResponse = await axios.post('/sendMessage', { newMessage, sessionId });
         // local development code end
+
         const messages = this.state.messages;
-        messages[loadingMessageIndex] = dialogFlowResponse.data;
-        this.setState({ messages });
+        const { text, card } = dialogFlowResponse.data
+        
+        if (card) {
+          const materialCard = <MessageCard data={card.messageContent} />
+          messages[loadingMessageIndex] = { ...card, messageContent: materialCard };
+        } else {
+          messages[loadingMessageIndex] = text;
+        }
+        this.setState({ messages }, () => {
+          // function to scroll to bottom of input box
+          const { messagesContainer } = this.refs;
+          messagesContainer.scrollTop = messagesContainer.scrollHeight - messagesContainer.clientHeight;
+        });
       }
     )
   }
@@ -97,7 +113,7 @@ class App extends Component {
             <div className='App-Paper-MessageContainer' ref='messagesContainer'>
               {this.state.messages.map(message => <IndividualMessage
                 senderIsHuman={message.senderIsHuman}
-                messageText={message.messageText}
+                messageContent={message.messageContent}
                 key={message.sentUtcTime}
               />)}
             </div>

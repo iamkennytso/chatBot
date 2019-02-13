@@ -11,14 +11,14 @@ const port = 5001;
 app.listen(port, ()=> console.log(`(>'.')> listening on ${port}`))
 
 app.post ('/sendMessage', async (request, response) => {
-  const sessionId = uuid.v4()
+
   const sessionClient = new dialogflow.SessionsClient();
-  const sessionPath = sessionClient.sessionPath('testdiaflow-cffb8', sessionId)
+  const sessionPath = sessionClient.sessionPath('testdiaflow-cffb8', request.body.sessionId)
   const dialogFlowRequest = {
     session: sessionPath,
     queryInput: {
       text: {
-        text: request.body.newMessage.messageText,
+        text: request.body.newMessage.messageContent,
         languageCode: 'en-US',
       }
     }
@@ -26,16 +26,26 @@ app.post ('/sendMessage', async (request, response) => {
 
   try {
     const dialogFlowResponse = await sessionClient.detectIntent(dialogFlowRequest);
+    const text = dialogFlowResponse[0].queryResult.fulfillmentMessages.find(message => message.message === 'text').text.text[0];
+    const card = dialogFlowResponse[0].queryResult.fulfillmentMessages.find(message => message.message === 'card');
     response.send({
-      senderIsHuman: false,
-      messageText: dialogFlowResponse[0].queryResult.fulfillmentText,
-      sentUtcTime: new Date().getTime(),
-    });
+      text: {
+        senderIsHuman: false,
+        messageContent: text,
+        sentUtcTime: new Date().getTime(),
+      },
+      card: card &&
+      {
+        senderIsHuman: false,
+        messageContent: card.card,
+        sentUtcTime: new Date().getTime(),
+      },
+  });
   } catch (err) {
     console.error(err);
     response.send({
       senderIsHuman: false,
-      messageText: 'An Error occured, please check your connection!',
+      messageContent: 'An Error occured, please check your connection!',
       sentUtcTime: new Date().getTime(),
     });
   }

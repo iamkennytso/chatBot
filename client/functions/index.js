@@ -1,5 +1,5 @@
 const functions = require('firebase-functions');
-const { WebhookClient } = require('dialogflow-fulfillment');
+const { WebhookClient, Card } = require('dialogflow-fulfillment');
 // const dialogflow = require('dialogflow')
 // const uuid = require('uuid')
 
@@ -7,20 +7,24 @@ const findWeaknessDialogFlowFulfillment = functions.https.onRequest((request, re
   const agent = new WebhookClient({ request, response });
 
   const pokemonWeaknessByType = ({ pokemonWeaknessTypes, pokemonName }) => {
+    console.log(pokemonName)
     const typeArray = pokemonWeaknessTypes || request.body.queryResult.parameters.Types;
     const { quadDamage, doubleDamage } = getWeaknesses(typeArray);
+    let formattedPokemonName;
+    if (pokemonName) {
+      formattedPokemonName = pokemonName.replace(/-/g, ' ');
+    }
     if (!quadDamage && !doubleDamage) {
       return agent.add(`Are you sure about those types?`); 
     }
     const introString = pokemonName
-      ? `${pokemonName} takes`
+      ? `${formattedPokemonName} takes`
       : `${typeArray[0]} ${
           typeArray[1] 
             ? ` and ${typeArray[1]}`
             : ''
-        } Pokemons take`
-      
-    agent.add(`${introString} ${
+        } Pokemons take`;
+    const string = `${introString} ${
       quadDamage.length
         ? `quadtruple damage from ${quadDamage.join(', ')}${
             doubleDamage.length ? ' and ' : ''
@@ -34,12 +38,26 @@ const findWeaknessDialogFlowFulfillment = functions.https.onRequest((request, re
         !quadDamage.length && !doubleDamage.length
           ? `no reduced damage`
           : ''
-    }.`);
+    }.`
+    agent.add(string)
+    if (pokemonName) {
+      agent.add(new Card({
+          title: `${formattedPokemonName}`,
+          imageUrl: `https://img.pokemondb.net/artwork/large/${pokemonName.toLowerCase()}.jpg`,
+          text: string,
+          buttonText: 'Bulbapedia Page',
+          buttonUrl: `https://bulbapedia.bulbagarden.net/wiki/${
+            pokemonName.indexOf('-') > 0 
+              ? pokemonName.slice(0, pokemonName.indexOf('-')) 
+              : pokemonName
+          }_(Pok%C3%A9mon)`,
+        })
+      );
+    }
   }
 
   const pokemonWeaknessesByName = ({ pokemon }) => {
     const pokemonName = pokemon || request.body.queryResult.parameters.completePokemon;
-    console.log(pokemonName)
     const weaknesses = pokemonTypes[pokemonName] // { type1: 'Grass', type2: 'Poison' }
     // Object.values doesn't work with cloud functions
     pokemonWeaknessTypes = []; // ['Grass', 'Poison']
@@ -526,10 +544,12 @@ const pokemonTypes = {
 
 const titleCase = str => str
   .toLowerCase()
-  .replace(/-/g, ' ')
   .split(' ').map((word) => word
     .replace(word[0], word[0].toUpperCase()))
-    .join(' ');
+  .join(' ')
+  .split('-').map((word) => word
+    .replace(word[0], word[0].toUpperCase()))
+  .join('-');
 
 module.exports = { 
   getWeaknesses, 
