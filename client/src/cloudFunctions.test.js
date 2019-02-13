@@ -1,4 +1,4 @@
-const { getWeaknesses } = require('../functions/index')
+const { getWeaknesses, findWeaknessDialogFlowFulfillment } = require('../functions/index')
 
 it('gets weaknesses correctly', () => {
   const fireWeakness = getWeaknesses(['Fire']);
@@ -19,3 +19,4 @@ it('gets weaknesses correctly', () => {
     expect(threeTypeWeakness.doubleDamage).toEqual(undefined);
     expect(threeTypeWeakness.quadDamage).toEqual(undefined);
 })
+
