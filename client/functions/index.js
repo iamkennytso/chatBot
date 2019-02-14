@@ -6,165 +6,128 @@ const { WebhookClient, Card } = require('dialogflow-fulfillment');
 const findWeaknessDialogFlowFulfillment = functions.https.onRequest((request, response) => {
   const agent = new WebhookClient({ request, response });
 
-  const pokemonWeaknessByType = ({ pokemonWeaknessTypes, pokemonName }) => {
-    console.log(pokemonName)
-    const typeArray = pokemonWeaknessTypes || request.body.queryResult.parameters.Types;
-    const { quadDamage, doubleDamage } = getWeaknesses(typeArray);
-    let formattedPokemonName;
-    if (pokemonName) {
-      formattedPokemonName = pokemonName.replace(/-/g, ' ');
-    }
-    if (!quadDamage && !doubleDamage) {
-      return agent.add(`Are you sure about those types?`); 
-    }
-    const introString = pokemonName
-      ? `${formattedPokemonName} takes`
-      : `${typeArray[0]} ${
-          typeArray[1] 
-            ? ` and ${typeArray[1]}`
-            : ''
-        } Pokemons take`;
-    const string = `${introString} ${
-      quadDamage.length
-        ? `quadtruple damage from ${quadDamage.join(', ')}${
-            doubleDamage.length ? ' and ' : ''
-          }`
-        : ''
-      }${
-      doubleDamage.length 
-        ? `double damage from ${doubleDamage.join(', ')}`
-        : '' 
-      }${
-        !quadDamage.length && !doubleDamage.length
-          ? `no reduced damage`
-          : ''
-    }.`
-    agent.add(string)
-    if (pokemonName) {
-      agent.add(new Card({
-          title: `${formattedPokemonName}`,
-          imageUrl: `https://img.pokemondb.net/artwork/large/${pokemonName.toLowerCase()}.jpg`,
-          text: string,
-          buttonText: 'Bulbapedia Page',
-          buttonUrl: `https://bulbapedia.bulbagarden.net/wiki/${
-            pokemonName.indexOf('-') > 0 
-              ? pokemonName.slice(0, pokemonName.indexOf('-')) 
-              : pokemonName
-          }_(Pok%C3%A9mon)`,
-        })
-      );
-    }
-  }
-
-  const pokemonWeaknessesByName = ({ pokemon }) => {
-    const pokemonName = pokemon || request.body.queryResult.parameters.completePokemon;
-    const weaknesses = pokemonTypes[pokemonName] // { type1: 'Grass', type2: 'Poison' }
-    // Object.values doesn't work with cloud functions
-    pokemonWeaknessTypes = []; // ['Grass', 'Poison']
-    for (let type in weaknesses) {
-      pokemonWeaknessTypes.push(weaknesses[type]);
-    }
-    pokemonWeaknessByType({pokemonWeaknessTypes, pokemonName: titleCase(pokemonName)});
-  }
-
-  const pokemonWeaknessWithGender = () => {
-    const {genderedPokemon, genders} = request.body.queryResult.parameters; // Nidoran, -M
-    pokemonWeaknessesByName({pokemon: `${genderedPokemon}${genders}`});
-  }
-  const pokemonWeaknessWithRegionalVariant = () => {
-    const {alolanOrNot, alolanPokemon} = request.body.queryResult.parameters; //Raichu, -alolan
-    pokemonWeaknessesByName({pokemon: `${alolanPokemon}${alolanOrNot === 'regular' ? '' : '-alolan'}`});
-  }
-  
-  const pokemonWeaknessWithMegaEvolution = () => {
-    const {megaOrNot , megaPokemon} = request.body.queryResult.parameters; //Pinsir, -Mega
-    pokemonWeaknessesByName({pokemon: `${megaPokemon}${megaOrNot === 'regular' ? '' : '-Mega'}`});
-  }
-
-  const pokemonWeaknessWithMegaEvolutionVariant = () => {
-    const parameters = request.body.queryResult.parameters;
-    const context = agent.context.get('megavariant');
-    const conParas = context && context.parameters
-
-    const megaVariantPokemon = parameters.megaVariantPokemon || (conParas && conParas.megaVariantPokemon) || '';
-    const megaOrNot = parameters.megaOrNot || (conParas && conParas.megaOrNot) || '';
-    const xOrY = parameters.xOrY || (conParas && conParas.xOrY) || '';
-
-    const gotPokemon = megaVariantPokemon.length > 0;
-    const gotMega = megaOrNot.length > 0;
-    const gotXOrY = xOrY.length > 0;
-
-    if( !gotPokemon ) {
-      agent.add(`Which pokemon are you searching for?`);
-    } else if (!gotMega) {
-      agent.add(`Is ${megaVariantPokemon} mega evolved?`);
-    } else if (gotPokemon && megaOrNot === 'regular') {
-      pokemonWeaknessesByName({ pokemon: megaVariantPokemon });
-      deleteContext();
-    } else if (gotPokemon && megaOrNot === 'Mega' && !gotXOrY) {
-      agent.add('Is it the X or Y varient?');
-    } else if (gotPokemon && megaOrNot === 'Mega' && gotXOrY) {
-      pokemonWeaknessesByName({ pokemon: `${megaVariantPokemon}-${megaOrNot}-${xOrY}` });
-      deleteContext();
-    }
-  }
-
-  const deleteContext = () => {
-    if (
-      request.body.queryResult.outputContexts &&
-      request.body.queryResult.outputContexts !== 0
-    ) {
-      request.body.queryResult.outputContexts.forEach(context => {
-        agent.context.delete(context.name.slice(context.name.lastIndexOf('/')+1));
-      })
-    }
-  }
-
   let intentMap = new Map();
   intentMap.set('pokemonTypeWeakness', pokemonWeaknessByType);
   intentMap.set('specificPokemonWeakness', pokemonWeaknessesByName);
   intentMap.set('genderedPokemonWeakness', pokemonWeaknessWithGender);
-  intentMap.set('alolanPokemonWeakness', pokemonWeaknessWithRegionalVariant)
-  intentMap.set('megaPokemonWeakness', pokemonWeaknessWithMegaEvolution)
-  intentMap.set('megaPokemonVariantWeakness', pokemonWeaknessWithMegaEvolutionVariant)
-  intentMap.set('megaPokemonVariantWeakness - xOrY', pokemonWeaknessWithMegaEvolutionVariant)
+  intentMap.set('alolanPokemonWeakness', pokemonWeaknessWithRegionalVariant);
+  intentMap.set('megaPokemonWeakness', pokemonWeaknessWithMegaEvolution);
+  intentMap.set('megaPokemonVariantWeakness', pokemonWeaknessWithMegaEvolutionVariant);
+  intentMap.set('megaPokemonVariantWeakness - xOrY', pokemonWeaknessWithMegaEvolutionVariant);
   agent.handleRequest(intentMap);
 })
 
-// TODO: to get this function in the cloud, figure out how to authenticate live
-// const receiveMessage = functions.https.onRequest((request, response) => {
-//   const sessionId = uuid.v4()
-//   const sessionClient = new dialogflow.SessionsClient();
-//   const sessionPath = sessionClient.sessionPath('testdiaflow-cffb8', sessionId)
-//   const dialogFlowRequest = {
-//     session: sessionPath,
-//     queryInput: {
-//       text: {
-//         text: request.body.newMessage,
-//         languageCode: 'en-US',
-//       }
-//     }
-//   };
+// all weakness calls eventually calls this function
+const pokemonWeaknessByType = (agent, pokemonObj = {}) => {
+  const { pokemonWeaknessTypes, pokemonName } = pokemonObj
+  console.log(pokemonName)
+  const typeArray = pokemonWeaknessTypes || agent.parameters.Types;
+  const { quadDamage, doubleDamage } = calculateWeaknesses(typeArray);
+  let formattedPokemonName;
+  if (pokemonName) {
+    formattedPokemonName = pokemonName.replace(/-/g, ' ');
+  }
+  if (!quadDamage && !doubleDamage) {
+    return agent.add(`Are you sure about those types?`); 
+  }
+  const introString = pokemonName
+    ? `${formattedPokemonName} takes`
+    : `${typeArray[0]} ${
+        typeArray[1] 
+          ? ` and ${typeArray[1]}`
+          : ''
+      } Pokemons take`;
+  const string = `${introString} ${
+    quadDamage.length
+      ? `quadtruple damage from ${quadDamage.join(', ')}${
+          doubleDamage.length ? ' and ' : ''
+        }`
+      : ''
+    }${
+    doubleDamage.length 
+      ? `double damage from ${doubleDamage.join(', ')}`
+      : '' 
+    }${
+      !quadDamage.length && !doubleDamage.length
+        ? `no reduced damage`
+        : ''
+  }.`
+  agent.add(string)
+  if (pokemonName) {
+    agent.add(new Card({
+        title: `${formattedPokemonName}`,
+        imageUrl: `https://img.pokemondb.net/artwork/large/${pokemonName.toLowerCase()}.jpg`,
+        text: string,
+        buttonText: 'Bulbapedia Page',
+        buttonUrl: `https://bulbapedia.bulbagarden.net/wiki/${
+          pokemonName.indexOf('-') > 0 
+            ? pokemonName.slice(0, pokemonName.indexOf('-')) 
+            : pokemonName
+        }_(Pok%C3%A9mon)`,
+      })
+    );
+  }
+  return agent;
+}
 
-//   try {
-//     const dialogFlowResponse = await sessionClient.detectIntent(dialogFlowRequest)
-//     response.send({
-//       senderIsHuman: false,
-//       messageText: dialogFlowResponse[0].queryResult.fulfillmentText,
-//       sentUtcTime: new Date().getTime(),
-//     })
-//   } catch (err) {
-//     console.error(err)
-//     response.send({
-//       senderIsHuman: false,
-//       messageText: 'An Error occured, please check your connection!',
-//       sentUtcTime: new Date().getTime(),
-//     })
-//   }
-// })
+const pokemonWeaknessesByName = ( agent, pokemonObj = {} ) => {
+  console.log(agent)
+  console.log(agent.parameters)
+  console.log(pokemonObj)
+  const pokemonName = pokemonObj.pokemon || agent.parameters.completePokemon;
+  console.log(pokemonName)
+  const weaknesses = pokemonTypes[pokemonName] // { type1: 'Grass', type2: 'Poison' }
+  // Object.values doesn't work with cloud functions
+  pokemonWeaknessTypes = []; // ['Grass', 'Poison']
+  for (let type in weaknesses) {
+    pokemonWeaknessTypes.push(weaknesses[type]);
+  }
+  pokemonWeaknessByType(agent, {pokemonWeaknessTypes, pokemonName: titleCase(pokemonName)});
+}
+
+const pokemonWeaknessWithGender = agent => {
+  const {genderedPokemon, genders} = agent.parameters; // Nidoran, -M
+  pokemonWeaknessesByName(agent, {pokemon: `${genderedPokemon}${genders}`});
+}
+
+const pokemonWeaknessWithRegionalVariant = agent => {
+  const {alolanOrNot, alolanPokemon} = agent.parameters; //Raichu, -alolan
+  pokemonWeaknessesByName(agent, {pokemon: `${alolanPokemon}${alolanOrNot === 'regular' ? '' : '-alolan'}`});
+}
+
+const pokemonWeaknessWithMegaEvolution = agent => {
+  const {megaOrNot , megaPokemon} = agent.parameters; //Pinsir, Mega
+  pokemonWeaknessesByName(agent, {pokemon: `${megaPokemon}${megaOrNot === 'regular' ? '' : '-Mega'}`});
+}
+
+const pokemonWeaknessWithMegaEvolutionVariant = agent => {
+  const parameters = agent.parameters;
+  const context = agent.context.get('megavariant');
+  const conParas = context && context.parameters;
+
+  const megaVariantPokemon = parameters.megaVariantPokemon || (conParas && conParas.megaVariantPokemon) || ''; // Mewtwo
+  const megaOrNot = parameters.megaOrNot || (conParas && conParas.megaOrNot) || ''; // Mega
+  const xOrY = parameters.xOrY || (conParas && conParas.xOrY) || ''; // Y
+
+  const gotPokemon = megaVariantPokemon.length > 0;
+  const gotMega = megaOrNot.length > 0;
+  const gotXOrY = xOrY.length > 0;
+
+  if( !gotPokemon ) {
+    return agent.add(`Which pokemon are you searching for?`);
+  } else if (!gotMega) {
+    return agent.add(`Is ${megaVariantPokemon} mega evolved?`);
+  } else if (gotPokemon && megaOrNot === 'regular') {
+    pokemonWeaknessesByName(agent, { pokemon: megaVariantPokemon });
+  } else if (gotPokemon && megaOrNot === 'Mega' && !gotXOrY) {
+    return agent.add('Is it the X or Y varient?');
+  } else if (gotPokemon && megaOrNot === 'Mega' && gotXOrY) {
+    pokemonWeaknessesByName(agent, { pokemon: `${megaVariantPokemon}-${megaOrNot}-${xOrY}` });
+  }
+}
 
 // spread operator doesn't work in cloud functions
-const getWeaknesses = typeArray => {
+const calculateWeaknesses = typeArray => {
   if (typeArray.length !== 1 && typeArray.length !== 2) {
     return {};
   }
@@ -192,7 +155,7 @@ const getWeaknesses = typeArray => {
       doubleDamage.push(weakness);
     }
   }
-  return {quadDamage, doubleDamage};
+  return { quadDamage, doubleDamage };
 }
 
 const weaknesses = {
@@ -542,7 +505,8 @@ const pokemonTypes = {
   Mew: { type1: 'Psychic' } ,
 };
 
-const titleCase = str => str
+const titleCase = str => {
+  return str
   .toLowerCase()
   .split(' ').map((word) => word
     .replace(word[0], word[0].toUpperCase()))
@@ -550,9 +514,11 @@ const titleCase = str => str
   .split('-').map((word) => word
     .replace(word[0], word[0].toUpperCase()))
   .join('-');
+}
 
 module.exports = { 
-  getWeaknesses, 
+  calculateWeaknesses, 
   findWeaknessDialogFlowFulfillment, 
+  titleCase
   // receiveMessage
 };

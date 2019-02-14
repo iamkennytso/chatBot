@@ -23,7 +23,7 @@ class App extends Component {
   };
 
   componentWillMount () {
-    const sessionId = uuid.v4()
+    const sessionId = uuid.v4();
     this.setState({ sessionId })
   };
 
@@ -63,7 +63,7 @@ class App extends Component {
       return;
     }
     const sentUtcTime = new Date().getTime();
-    
+    const { messagesContainer } = this.refs;
     const newMessage = {
       senderIsHuman: true,
       messageContent: this.state.userInputMessage,
@@ -77,6 +77,7 @@ class App extends Component {
     const loadingMessageIndex = this.state.messages.length + 1;
     this.setState({ messages: [...this.state.messages, newMessage, loadingMessage], userInputMessage: INITIAL_STATE.userInputMessage },
       async () => {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight - messagesContainer.clientHeight;
         const { sessionId } = this.state;
 
         // local development code start
@@ -94,7 +95,6 @@ class App extends Component {
         }
         this.setState({ messages }, () => {
           // function to scroll to bottom of input box
-          const { messagesContainer } = this.refs;
           messagesContainer.scrollTop = messagesContainer.scrollHeight - messagesContainer.clientHeight;
         });
       }
