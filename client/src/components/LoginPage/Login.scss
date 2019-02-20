@@ -1,0 +1,41 @@
+.Login {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  height: 100%;
+
+  &-Name {
+    font-family: Myriad Pro;
+    font-size: 2em;
+    font-weight: bold;
+  }
+
+  &-Logo {
+    height: 50vh;
+  }
+
+  &-Message {
+    font-size: 1.25em;
+  }
+
+  &-Form {
+    width: 50vh;
+  }
+  
+  & &-Field {
+    margin-bottom: 1em;
+  }
+  
+  & &-Button {
+    margin-top: 1em;
+  }
+}
+
+input {
+  color: white !important;
+}
+div::after{
+  border-bottom: 2px solid white !important;
+}

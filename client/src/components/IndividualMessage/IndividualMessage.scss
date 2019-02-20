@@ -1,0 +1,25 @@
+.IndividualMessage{
+  border-radius: 5px;
+  margin: 5px;
+
+  img {
+    width: auto;
+  }
+}
+
+.isHuman{
+  &-true {
+    border: 1px solid blue;
+    padding: 3px;
+    background-color: lightblue;
+    display: flex;
+    justify-content: flex-end;
+    margin-left: 20%;
+  }
+  &-false {
+    border: 1px solid green;
+    padding: 3px;
+    background-color: lightgreen;
+    margin-right: 20%;
+  }
+}

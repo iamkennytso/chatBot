@@ -1,21 +1,39 @@
 # CBA Intro: Chatbot
-
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Development server
-Instructions here for how to run your development server
+### `nodemon server.js`
+Starts the backend server.
+
+### `cd client`
+### `npm start`
+
+Runs the app in the development mode.<br>
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+The page will reload if you make edits.<br>
+You will also see any lint errors in the console.
 
 ## Build
-Instructions here for how to build your app
+### `npm run build`
+
+Builds the app for production to the `build` folder.<br>
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.<br>
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
 ## Running unit tests
-Instructions here for how to run your tests
+### `npm test`
 
 ## Running end-to-end tests
-Instructions here for how to run e2e tests
+TODO
 
 # Introduction
 
-This project will serve as an introduction to the CBA practice at (Cedrus)[http://cedrus.digital]. As a member of the CBA team, you will work with Business Process Flows, Robotic Process Automation, and AI and machine learning interfaces.  To prepare you for that you'll create a chatbot with some additional features
+This project will serve as an introduction to the CBA practice at [Cedrus](http://cedrus.digital). As a member of the CBA team, you will work with Business Process Flows, Robotic Process Automation, and AI and machine learning interfaces.  To prepare you for that you'll create a chatbot with some additional features
 
 
 
