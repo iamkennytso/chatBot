@@ -1,19 +1,18 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const dialogflow = require('dialogflow')
-const uuid = require('uuid')
-require('dotenv').config()
+const express = require('express');
+const bodyParser = require('body-parser');
+const dialogflow = require('dialogflow');
+require('dotenv').config();
 
 let app = express();
 // app.use(express.static(__dirname + '/../build'))
 app.use(bodyParser.json())
 const port = 5001;
-app.listen(port, ()=> console.log(`(>'.')> listening on ${port}`))
+app.listen(port, ()=> console.log(`(>'.')> listening on ${port}`));
 
 app.post ('/sendMessage', async (request, response) => {
 
   const sessionClient = new dialogflow.SessionsClient();
-  const sessionPath = sessionClient.sessionPath('testdiaflow-cffb8', request.body.sessionId)
+  const sessionPath = sessionClient.sessionPath('testdiaflow-cffb8', request.body.sessionId);
   const dialogFlowRequest = {
     session: sessionPath,
     queryInput: {

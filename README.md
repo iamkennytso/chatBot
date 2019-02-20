@@ -1,13 +1,11 @@
-Application to get Let's Go Pikachu / Eevee's pokemon weaknessess as quickly and painlessly as possible. 
-
-Deploy [here.](https://letsgoweaknesses-8c995.firebaseapp.com/)
-
+# CBA Intro: Chatbot
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## Development server
+### `nodemon server.js`
+Starts the backend server.
 
-In the project directory, you can run:
-
+### `cd client`
 ### `npm start`
 
 Runs the app in the development mode.<br>
@@ -16,6 +14,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.<br>
 You will also see any lint errors in the console.
 
+## Build
 ### `npm run build`
 
 Builds the app for production to the `build` folder.<br>
@@ -26,18 +25,106 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
+## Running unit tests
+### `npm test`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Running end-to-end tests
+TODO
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+# Introduction
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+This project will serve as an introduction to the CBA practice at [Cedrus](http://cedrus.digital). As a member of the CBA team, you will work with Business Process Flows, Robotic Process Automation, and AI and machine learning interfaces.  To prepare you for that you'll create a chatbot with some additional features
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Requirements
+* UI built in framework of your choosing
+* Chat input with scrollable chat history
+* Dynamic response nodes that may include:
+* Customs styles
+* External links
+* Link Previews
+* Generated Documentation using library of your choice
+* Login with User Authentication
+* Use of 3 different chatbot platforms
+  * Amazon Lex, Google Dialogflow, Watson Assistant
+* NodeJs Backend
+* End to End and Unit testing
+* Ability to select chatbot platform by app configuration
+* Ability for chatbot to call/use external APIs and services
+* Deployment procedure configurable by environment.
+* Source Control w/ Git with appropriate branch management.
+* Protection of assets (API keys and any proprietary info should not be committed)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Nice to have
+
+* CI Deployment
+* Containerization
+
+
+
+## Getting started
+
+* Create a source code repo using github, gitlab, or bitbucket
+* Create a kanban board 
+* Create a project wiki (for Release Notes)
+
+## Working the Project
+
+###Using the Kanban:
+* Setup any missing swimlanes (e.g. Testing)
+* Split large tasks when appropriate
+* Add Validation for forms
+* Ensure router has multiple routes
+* Add support for tabular data display, sorting, and pagination
+
+### Using the Issue Tracker:
+* Open and close issues
+* Add enhancements (e.g. validation messages)
+
+### Using the Wiki:
+* CHANGELOG with release notes
+
+### Using git:
+* New features should be developed on branches
+* No development done on the master branch
+* Code should be merged using pull requests (PR)
+
+All feature requests and enhancements will be provided via kanban board and/or issue tracker.
+
+
+## Phase I
+
+The major technical concepts will cover:
+
+* Complete tutorial on 1 of the 3 chatbot platforms
+* Integrate chatbot with Node
+* Feature-branch development with git
+* Automated testing with Selenium
+* Browser DOM, XPath, and CSS selectors
+
+
+Key software methodology concepts:
+
+* Sprints and milestone tracking
+* Kanban boards (feature development)
+
+Start Up tasks:
+
+* Create an account of google dialog flow and work through he tutorial
+* Create Tasks on the Kanban board for your project
+* Decide on what kind of chatbot you will build
+
+
+
+By the end of the first week you should be well along in the chatbot tutorial if not completed and you should have decided on what that chat bots purpose will be.
+
+Once you have completed the first tutorial you should shift to creating your own chatbot.  Using the github repo you created starting added tasks to the kanban board and using the board and swimlanes to track you progress.
+
+During this phase you should do some basic setup and configure you development environment, build process and automated testing process. Depending on your chosen framework some tooling may be be provided out of the box.
+
+The first view should be a login page with a username and password field.
+
+This is good time to verify that your end to end tests are working. You should have a test verifying the expected rendering of your login form and automating login.
+
+You should also have a unit test verifying connectivity with one of the chat platforms

@@ -28,7 +28,7 @@ describe('calculates weaknesses correctly by type', () => {
   })
 })
 
-it('title cases strings properly', () => {
+describe('title cases strings properly', () => {
   expect(titleCase('pikachu')).toEqual('Pikachu');
   expect(titleCase('mewtwo-mega-x')).toEqual('Mewtwo-Mega-X');
   expect(titleCase('DRAGONITE')).toEqual('Dragonite');

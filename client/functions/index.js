@@ -517,6 +517,7 @@ const titleCase = str => {
 }
 
 module.exports = { 
+  pokemonWeaknessesByName,
   calculateWeaknesses, 
   findWeaknessDialogFlowFulfillment, 
   titleCase
