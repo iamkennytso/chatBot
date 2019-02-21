@@ -1,0 +1,10 @@
+
+{
+  "compilerOptions": {
+    "lib": ["es6", "dom"],
+  },
+  "files": [
+    "../server.ts"
+  ],
+  "include": ["../src"]
+}

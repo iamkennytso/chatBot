@@ -71,11 +71,7 @@ const pokemonWeaknessByType = (agent, pokemonObj = {}) => {
 }
 
 const pokemonWeaknessesByName = ( agent, pokemonObj = {} ) => {
-  console.log(agent)
-  console.log(agent.parameters)
-  console.log(pokemonObj)
   const pokemonName = pokemonObj.pokemon || agent.parameters.completePokemon;
-  console.log(pokemonName)
   const weaknesses = pokemonTypes[pokemonName] // { type1: 'Grass', type2: 'Poison' }
   // Object.values doesn't work with cloud functions
   pokemonWeaknessTypes = []; // ['Grass', 'Poison']
